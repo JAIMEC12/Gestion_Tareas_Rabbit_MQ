@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"      # AMQP
+      - "15672:15672"    # UI web
+    networks:
+      - iotnet
+
+  producer:
+    build: ./producer
+    depends_on:
+      - rabbitmq
+    networks:
+      - iotnet
+
+  worker:
+    build: ./worker
+    depends_on:
+      - rabbitmq
+    networks:
+      - iotnet
+
+networks:
+  iotnet:
+    driver: bridge
