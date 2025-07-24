@@ -1,11 +1,9 @@
-version: '3.9'
 services:
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:latest
     container_name: rabbitmq
     ports:
       - "5672:5672"      # AMQP
-      - "15672:15672"    # UI web
     networks:
       - iotnet
 
@@ -15,6 +13,7 @@ services:
       - rabbitmq
     networks:
       - iotnet
+    # restart: unless-stopped
 
   worker:
     build: ./worker
