@@ -1,27 +1,39 @@
+#Definicion de los contenderos y lo servicios que van a correr
 services:
+ # Servicio de RabbitMQ (broker de mensajes)
   rabbitmq:
-    image: rabbitmq:latest
-    container_name: rabbitmq
+    image: rabbitmq:latest # Usa la imagen oficial del RabbitMQ
+    container_name: rabbitmq # Indica el nombre del contenedor
     ports:
-      - "5672:5672"      # AMQP
+      - "5672:5672"      # AMQP Puerto para la comunicacion con el servicio RabbitMQ. Mapea el puerto del localhost con el contenedor
     networks:
-      - iotnet
+      - iotnet # Conecta este servicio a la red iotnet
 
+# Servicio productor de mensajes
   producer:
-    build: ./producer
+    build: ./producer # Construir el servicio a partir de la imagen desde el directorio './producer'
     depends_on:
-      - rabbitmq
-    networks:
-      - iotnet
-    # restart: unless-stopped
+      - rabbitmq  # Esperar a que el servicio rabbitmq esté ejecutándose
+    networks: 
+      - iotnet # Conecta este servicio a la red iotnet
 
+# Servicio de worker de mensajes
   worker:
+    build: ./worker # Construye el servicio a partir de la imagen desde el directorio './worker'
+    depends_on:
+      - rabbitmq # Espera que el servicio de productor y consumidor termine de ejecutarse primero
+      - producer
+    networks:
+      - iotnet # Conecta este servicio a la red iotnet
+
+  worker1:
     build: ./worker
     depends_on:
       - rabbitmq
+      - producer
     networks:
       - iotnet
 
 networks:
-  iotnet:
-    driver: bridge
+  iotnet: # Nombre de la red personalizada
+    driver: bridge # Usar driver bridge (red local entre contenedores)
